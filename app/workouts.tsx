@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, ScrollView } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
+import { Pedometer } from 'expo-sensors';
 
 export default function Workouts() {
   const [workouts, setWorkouts] = useState([]);
@@ -19,6 +20,36 @@ export default function Workouts() {
     'Deadlift': '275 lbs',
     '5K Run': '25:30'
   });
+  const [stepCount, setStepCount] = useState(0);
+  const [isPedometerAvailable, setPedometerAvailable] = useState('checking');
+
+  useEffect(() => {
+    const subscribe = async () => {
+      try {
+        const isAvailable = await Pedometer.isAvailableAsync();
+        setPedometerAvailable(String(isAvailable));
+
+        if (isAvailable) {
+          const end = new Date();
+          const start = new Date();
+          start.setHours(0, 0, 0, 0);
+
+          const result = await Pedometer.getStepCountAsync(start, end);
+          setStepCount(result?.steps || 0);
+
+          const subscription = Pedometer.watchStepCount(result => {
+            setStepCount(result.steps);
+          });
+
+          return () => subscription.remove();
+        }
+      } catch (error) {
+        console.log('Pedometer error:', error);
+      }
+    };
+
+    subscribe();
+  }, []);
 
   const categories = {
     strength: { icon: '💪', color: '#FF6B6B' },
@@ -101,6 +132,11 @@ export default function Workouts() {
           <MaterialIcons name="timer" size={24} color="#FF6B6B" />
           <Text style={styles.statValue}>480</Text>
           <Text style={styles.statLabel}>Minutes Active</Text>
+        </View>
+        <View style={styles.statCard}>
+          <MaterialIcons name="directions-walk" size={24} color="#4CAF50" />
+          <Text style={styles.statValue}>{stepCount}</Text>
+          <Text style={styles.statLabel}>Steps Today</Text>
         </View>
       </View>
 
@@ -312,8 +348,10 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-around',
     padding: 15,
+    gap: 10,
   },
   statCard: {
     backgroundColor: 'white',
