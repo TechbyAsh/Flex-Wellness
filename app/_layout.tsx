@@ -1,10 +1,30 @@
-import React from 'react';
+
+import React, { useEffect } from 'react';
 import { Stack } from "expo-router";
 import { View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
 
 export default function RootLayout() {
+  const router = useRouter();
+
+  useEffect(() => {
+    checkOnboardingStatus();
+  }, []);
+
+  const checkOnboardingStatus = async () => {
+    try {
+      const status = await AsyncStorage.getItem('hasSeenOnboarding');
+      if (status !== 'true') {
+        router.replace('/onboarding');
+      }
+    } catch (error) {
+      console.error(error);
+      router.replace('/onboarding');
+    }
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <LinearGradient

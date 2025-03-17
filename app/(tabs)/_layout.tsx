@@ -1,3 +1,4 @@
+
 import { Tabs } from "expo-router";
 import { MaterialIcons } from '@expo/vector-icons';
 
@@ -9,7 +10,9 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: 'white',
           borderTopWidth: 1,
-          borderTopColor: '#e5e5e5'
+          borderTopColor: '#e5e5e5',
+          height: 60,
+          paddingBottom: 5
         }
       }}
     >
