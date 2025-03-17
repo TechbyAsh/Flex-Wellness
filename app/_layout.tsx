@@ -5,6 +5,12 @@ import { View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
 export default function Layout() {
+  const [isFirstLaunch, setIsFirstLaunch] = useState(true);
+
+  if (isFirstLaunch) {
+    return <Slot />;
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <LinearGradient
