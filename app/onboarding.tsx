@@ -29,7 +29,7 @@ const onboardingSteps = [
 export default function OnboardingScreen() {
   const [currentStep, setCurrentStep] = useState(0);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < onboardingSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
