@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Tabs } from "expo-router";
+import { Tabs, Slot } from "expo-router";
 import { LinearGradient } from 'expo-linear-gradient';
 import { View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
