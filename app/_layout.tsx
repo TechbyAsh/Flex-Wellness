@@ -50,6 +50,13 @@ export default function Layout() {
             tabBarIcon: ({ color }) => <TabBarIcon name="fitness-center" color={color} />,
           }}
         />
+        <Tabs.Screen
+          name="community"
+          options={{
+            title: 'Community',
+            tabBarIcon: ({ color }) => <TabBarIcon name="people" color={color} />,
+          }}
+        />
       </Tabs>
     </View>
   );
