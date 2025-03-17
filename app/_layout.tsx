@@ -57,6 +57,13 @@ export default function Layout() {
             tabBarIcon: ({ color }) => <TabBarIcon name="people" color={color} />,
           }}
         />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: 'Profile',
+            tabBarIcon: ({ color }) => <TabBarIcon name="person" color={color} />,
+          }}
+        />
       </Tabs>
     </View>
   );
