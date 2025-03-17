@@ -1,20 +1,38 @@
-
 import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, ScrollView } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function Workouts() {
   const [workouts, setWorkouts] = useState([]);
   const [newGoal, setNewGoal] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('strength');
   const [targetValue, setTargetValue] = useState('');
+  const [activityLog, setActivityLog] = useState([
+    { date: '2024-01-20', type: 'Running', duration: '30 min', distance: '4km' },
+    { date: '2024-01-19', type: 'Weight Training', duration: '45 min', weight: '150lbs' }
+  ]);
+  const [personalRecords, setPersonalRecords] = useState({
+    'Bench Press': '185 lbs',
+    'Squat': '225 lbs',
+    'Deadlift': '275 lbs',
+    '5K Run': '25:30'
+  });
 
   const categories = {
     strength: { icon: '💪', color: '#FF6B6B' },
     cardio: { icon: '🏃‍♂️', color: '#4ECDC4' },
     flexibility: { icon: '🧘‍♀️', color: '#95E1D3' },
     weight: { icon: '⚖️', color: '#88D8B0' }
+  };
+
+  const recordNewActivity = () => {
+    // Implementation for logging new activities
+  };
+
+  const updatePersonalRecord = (exercise, value) => {
+    setPersonalRecords({...personalRecords, [exercise]: value});
   };
 
   const addWorkout = () => {
@@ -65,14 +83,56 @@ export default function Workouts() {
   );
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <LinearGradient
         colors={['#4ECDC4', '#556270']}
         style={styles.gradientHeader}
       >
-        <Text style={styles.headerText}>Fitness Goals</Text>
+        <Text style={styles.headerText}>Fitness Tracker</Text>
       </LinearGradient>
 
+      <View style={styles.statsContainer}>
+        <View style={styles.statCard}>
+          <MaterialIcons name="trending-up" size={24} color="#4ECDC4" />
+          <Text style={styles.statValue}>12</Text>
+          <Text style={styles.statLabel}>Workouts This Month</Text>
+        </View>
+        <View style={styles.statCard}>
+          <MaterialIcons name="timer" size={24} color="#FF6B6B" />
+          <Text style={styles.statValue}>480</Text>
+          <Text style={styles.statLabel}>Minutes Active</Text>
+        </View>
+      </View>
+
+      <Text style={styles.sectionTitle}>Personal Records</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.recordsScroll}>
+        {Object.entries(personalRecords).map(([exercise, record]) => (
+          <View key={exercise} style={styles.recordCard}>
+            <Text style={styles.recordExercise}>{exercise}</Text>
+            <Text style={styles.recordValue}>{record}</Text>
+          </View>
+        ))}
+      </ScrollView>
+
+      <Text style={styles.sectionTitle}>Activity Log</Text>
+      <FlatList
+        data={activityLog}
+        renderItem={({ item }) => (
+          <Animated.View entering={FadeInUp} style={styles.activityCard}>
+            <Text style={styles.activityDate}>{item.date}</Text>
+            <Text style={styles.activityType}>{item.type}</Text>
+            <Text style={styles.activityDetails}>
+              Duration: {item.duration}
+              {item.distance && ` • Distance: ${item.distance}`}
+              {item.weight && ` • Weight: ${item.weight}`}
+            </Text>
+          </Animated.View>
+        )}
+        keyExtractor={(item) => item.date}
+        style={styles.activityList}
+      />
+
+      <Text style={styles.sectionTitle}>Fitness Goals</Text>
       {renderCategorySelector()}
 
       <View style={styles.inputContainer}>
@@ -141,7 +201,7 @@ export default function Workouts() {
           </Animated.View>
         )}
       />
-    </View>
+    </ScrollView>
   );
 }
 
@@ -249,5 +309,80 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#666',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    padding: 15,
+  },
+  statCard: {
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 15,
+    alignItems: 'center',
+    width: '45%',
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginVertical: 5,
+  },
+  statLabel: {
+    color: '#666',
+    fontSize: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    padding: 15,
+    color: '#333',
+  },
+  recordsScroll: {
+    paddingHorizontal: 10,
+  },
+  recordCard: {
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 15,
+    marginHorizontal: 5,
+    minWidth: 120,
+  },
+  recordExercise: {
+    fontSize: 14,
+    color: '#666',
+  },
+  recordValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: 5,
+  },
+  activityCard: {
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 15,
+    marginHorizontal: 15,
+    marginBottom: 10,
+  },
+  activityDate: {
+    fontSize: 14,
+    color: '#666',
+  },
+  activityType: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginVertical: 5,
+  },
+  activityDetails: {
+    fontSize: 14,
+    color: '#666',
+  },
+  activityList: {
+    marginBottom: 15,
+  },
+  goalsContainer: {
+    padding: 15,
   },
 });
