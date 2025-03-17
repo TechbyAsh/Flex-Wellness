@@ -1,4 +1,5 @@
 
+import React, { useState } from 'react';
 import { Tabs } from "expo-router";
 import { LinearGradient } from 'expo-linear-gradient';
 import { View } from 'react-native';
