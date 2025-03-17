@@ -2,6 +2,7 @@
 import { Tabs } from "expo-router";
 import { LinearGradient } from 'expo-linear-gradient';
 import { View } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function Layout() {
   return (
