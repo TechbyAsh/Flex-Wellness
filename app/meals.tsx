@@ -1,6 +1,7 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, ScrollView } from 'react-native';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 
@@ -8,6 +9,30 @@ export default function Meals() {
   const [searchQuery, setSearchQuery] = useState('');
   const [meals, setMeals] = useState([]);
   const [selectedMeal, setSelectedMeal] = useState('breakfast');
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanning, setScanning] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
+  }, []);
+
+  const handleBarCodeScanned = async ({ data }) => {
+    setScanning(false);
+    try {
+      const response = await fetch(
+        `https://world.openfoodfacts.org/api/v0/product/${data}.json`
+      );
+      const result = await response.json();
+      if (result.status === 1) {
+        setMeals([result.product]);
+      }
+    } catch (error) {
+      console.error('Error fetching product:', error);
+    }
+  };
 
   const dailySummary = {
     calories: 2000,
@@ -90,8 +115,29 @@ export default function Meals() {
         renderMealSection(type, data)
       )}
 
-      {selectedMeal && (
+      {scanning && (
+        <View style={styles.scannerContainer}>
+          <BarCodeScanner
+            onBarCodeScanned={handleBarCodeScanned}
+            style={styles.scanner}
+          />
+          <TouchableOpacity 
+            style={styles.closeScannerButton}
+            onPress={() => setScanning(false)}
+          >
+            <Text style={styles.buttonText}>Close Scanner</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      
+      {selectedMeal && !scanning && (
         <View style={styles.searchContainer}>
+          <TouchableOpacity 
+            style={styles.scanButton} 
+            onPress={() => setScanning(true)}
+          >
+            <Text style={styles.buttonText}>Scan Barcode</Text>
+          </TouchableOpacity>
           <TextInput
             style={styles.searchInput}
             placeholder="Search food..."
@@ -126,6 +172,31 @@ export default function Meals() {
 }
 
 const styles = StyleSheet.create({
+  scannerContainer: {
+    height: 300,
+    width: '100%',
+    overflow: 'hidden',
+    marginVertical: 15,
+  },
+  scanner: {
+    height: '100%',
+    width: '100%',
+  },
+  scanButton: {
+    backgroundColor: '#4ECDC4',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  closeScannerButton: {
+    backgroundColor: '#ff6b6b',
+    padding: 12,
+    borderRadius: 8,
+    position: 'absolute',
+    bottom: 10,
+    left: 10,
+    right: 10,
+  },
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
