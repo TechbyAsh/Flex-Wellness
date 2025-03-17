@@ -33,6 +33,7 @@ export default function OnboardingScreen() {
     if (currentStep < onboardingSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
+      await AsyncStorage.setItem('hasSeenOnboarding', 'true');
       router.replace('/(tabs)');
     }
   };
