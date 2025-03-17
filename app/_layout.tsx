@@ -1,12 +1,13 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Stack } from "expo-router";
 import { View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
 
 export default function RootLayout() {
-  const [hasSeenOnboarding, setHasSeenOnboarding] = useState<boolean | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     checkOnboardingStatus();
@@ -15,15 +16,15 @@ export default function RootLayout() {
   const checkOnboardingStatus = async () => {
     try {
       const status = await AsyncStorage.getItem('hasSeenOnboarding');
-      setHasSeenOnboarding(status === 'true');
+      if (status !== 'true') {
+        router.replace('/onboarding');
+      } else {
+        router.replace('/(tabs)');
+      }
     } catch (error) {
-      setHasSeenOnboarding(false);
+      router.replace('/onboarding');
     }
   };
-
-  if (hasSeenOnboarding === null) {
-    return null; // Loading state
-  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -32,11 +33,8 @@ export default function RootLayout() {
         style={{ position: 'absolute', width: '100%', height: '100%' }}
       />
       <Stack screenOptions={{ headerShown: false }}>
-        {!hasSeenOnboarding ? (
-          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-        ) : (
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        )}
+        <Stack.Screen name="onboarding" />
+        <Stack.Screen name="(tabs)" />
       </Stack>
     </View>
   );
