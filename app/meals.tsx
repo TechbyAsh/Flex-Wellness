@@ -1,7 +1,8 @@
 
 import { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, ScrollView } from 'react-native';
-import { BarCodeScanner } from 'expo-barcode-scanner';
+
+import { Camera, CameraType } from 'expo-camera';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 
@@ -14,7 +15,7 @@ export default function Meals() {
 
   useEffect(() => {
     (async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');
     })();
   }, []);
@@ -115,20 +116,21 @@ export default function Meals() {
         renderMealSection(type, data)
       )}
 
-      {scanning && (
-        <View style={styles.scannerContainer}>
-          <BarCodeScanner
-            onBarCodeScanned={handleBarCodeScanned}
-            style={styles.scanner}
-          />
-          <TouchableOpacity 
-            style={styles.closeScannerButton}
-            onPress={() => setScanning(false)}
-          >
-            <Text style={styles.buttonText}>Close Scanner</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+{scanning && (
+  <View style={styles.scannerContainer}>
+    <Camera
+      style={styles.scanner}
+      type={Camera.Constants.Type.back}
+      onBarCodeScanned={handleBarCodeScanned}
+    />
+    <TouchableOpacity 
+      style={styles.closeScannerButton}
+      onPress={() => setScanning(false)}
+    >
+      <Text style={styles.buttonText}>Close Scanner</Text>
+    </TouchableOpacity>
+  </View>
+)}
       
       {selectedMeal && !scanning && (
         <View style={styles.searchContainer}>
