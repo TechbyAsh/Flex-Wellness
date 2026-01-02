@@ -1,18 +1,20 @@
 # Small, stable base image
 FROM node:20-alpine
 
-# Create app directory
+# Create application directory
 WORKDIR /app
 
-# Install only production deps first (better caching)
-COPY src/package.json src/package-lock.json* ./
+# Copy only API package artifacts first (better caching)
+COPY src/package*.json ./ 
+
+# Install production dependencies
 RUN npm install --omit=dev
 
-# Copy source
-COPY src/server.js ./
+# Copy full API source
+COPY src/ ./
 
-# Expose container port (documentation for humans)
+# Expose port (for documentation)
 EXPOSE 3000
 
-# Run the API
-CMD ["npm", "start"]
+# Start API
+CMD ["node", "server.js"]
